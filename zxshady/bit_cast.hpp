@@ -11,6 +11,19 @@
 #include <cstring>
 #endif
 
+
+#if defined(_MSC_VER) && !defined(__clang__)
+#define ZXSHADY_CPP_VER _MSVC_LANG
+#else
+#define ZXSHADY_CPP_VER __cplusplus
+#endif
+
+#if ZXSHADY_CPP_VER >= 201703L
+#define ZXSHADY_NODISCARD [[nodiscard]]
+#else
+#define ZXSHADY_NODISCARD
+#endif
+
 namespace zxshady {
 	
 template<typename T>
@@ -75,7 +88,8 @@ template<typename To,typename From,typename std::enable_if<!std::is_array<To>::v
 #ifdef __cpp_lib_bit_cast
 constexpr
 #endif
-To bit_cast(const From& from) {
+ZXSHADY_NODISCARD
+To bit_cast(const From& from) noexcept {
 	static_assert(sizeof(To) == sizeof(From),"Size mismatch.");
 	static_assert(std::is_trivially_copyable<To>::value,"To must be trivially copyable.");
 	static_assert(std::is_trivially_copyable<From>::value,"From must be trivially copyable.");
@@ -92,7 +106,8 @@ template<typename To,typename From,typename std::enable_if<is_bounded_array<To>:
 #ifdef __cpp_lib_bit_cast
 constexpr
 #endif
-typename to_std_array<To>::type bit_cast(const From& from) {
+ZXSHADY_NODISCARD
+typename to_std_array<To>::type bit_cast(const From& from) noexcept {
 	static_assert(sizeof(To) == sizeof(From),"Size mismatch.");
 	static_assert(std::is_trivially_copyable<To>::value,"To must be trivially copyable.");
 	static_assert(std::is_trivially_copyable<From>::value,"From must be trivially copyable.");
@@ -110,8 +125,10 @@ template<typename To,typename From,typename std::enable_if<is_unbounded_array<To
 #ifdef __cpp_lib_bit_cast
 constexpr
 #endif
+ZXSHADY_NODISCARD
 std::array<typename std::remove_extent<To>::type,
 	(sizeof(From) / sizeof(typename std::remove_extent<To>::type))> bit_cast(const From& from) noexcept {
+		
 	using noextent = typename std::remove_extent<To>::type;
 
 	static_assert(sizeof(From) % sizeof(noextent) == 0, "zxshady::bit_cast<To[]>(From) an array of suitable size of type To must be equal to sizeof(From)");
