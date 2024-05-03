@@ -30,13 +30,13 @@ template<typename T>
 struct has_operator_addressof {
 private:
     template<typename T2 = T>
-    static auto free_check(T2 &&t) -> decltype(operator&(t), void(), std::true_type{});
+    static auto free_check(T2&& t) -> decltype(operator&(t), void(), std::true_type{});
     static auto free_check(...) -> std::false_type;
     template<typename T2 = T>
-    static auto member_check(T2 &&t) -> decltype(t.operator&(), void(), std::true_type{});
+    static auto member_check(T2&& t) -> decltype(t.operator&(), void(), std::true_type{});
     static auto member_check(...) -> std::false_type;
     template<typename T2 = T>
-    static auto check(T2 &&t) -> decltype(&t, void(), std::true_type{});
+    static auto check(T2&& t) -> decltype(&t, void(), std::true_type{});
     static auto check(...) -> std::false_type;
 public:
     constexpr static bool free_function = 
