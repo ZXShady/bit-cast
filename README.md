@@ -1,5 +1,5 @@
 # single header bit-cast
-a simple single header file that defines a function `zxshady::bit_cast<To>(From)` for versions prior to C++20 and has extra utilities
+a simple single header file that defines a function `zxshady::bit_cast<To>(From)` for versions prior to C++20 
 
 
 # How to use?
@@ -44,7 +44,7 @@ float Q_rsqrt(float number)
   std::memcpy(&i,&y,sizeof(y));
   y  = y * ( 1.5f - ( x2 * y * y ) );      // 1st iteration
 }
-// if you looked carefully i actually missed up the second memcpy and i copied y to i instead of i to y and this code
+// if you looked carefully i actually messed up the second memcpy and i copied y to i instead of i to y and this code
 // still has undefined behavoir if sizeof(long) != sizeof(float) you can put an assert but that is too much work so we can use zxshady::bit_cast instead 
 
 float Q_rsqrt(float number)
@@ -62,19 +62,20 @@ float Q_rsqrt(float number)
 
 ```
 
+# Note
+`constexpr` since C++20 (it will use std::bit_cast internally)
+
 # Other advantages over std::bit_cast
 
 1.  Works in C++11 and above
-2.  constexpr since C++20 (will use std::bit_cast internally)
-3.  has conversions to arrays of types (will return std::array)
-
+2.  has conversions to arrays of types (will return std::array) and deduces size for unbounded arrays
 ```cpp
 
 // auto bytes = std::bit_cast<char[4]>(1.0f); error cant return arrays
 // auto uhg_ugly = std::bit_cast<std::array<char,4>>(1.0f); // longer and more annoying to type
 auto bytes = zxshady::bit_cast<char[4]>(1.0f); // returns std::array<char,4>;
 auto bytes_2 = zxshady::bit_cast<char[]>(1.0f); //  deduces array length to 4 returns std::array<char,4>
-// auto bytes_3 = zxshady::bit_cast<char[5]>(1.0f); //  static assert will activate
+// auto bytes_3 = zxshady::bit_cast<char[5]>(1.0f); //  static assert will activate saying size mismatch
 auto shorts = zxshady::bit_cast<short[]>(1.0f); // deduces array length = 2 returns std::array<short,2>
 
 
