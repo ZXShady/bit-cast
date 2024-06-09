@@ -5,11 +5,6 @@
 #include <array>
 #include <type_traits>
 
-#ifdef __cpp_lib_bit_cast
-#include <bit>
-#else
-#include <cstring>
-#endif
 
 
 #if defined(_MSC_VER) && !defined(__clang__)
@@ -22,6 +17,12 @@
 #define ZXSHADY_NODISCARD [[nodiscard]]
 #else
 #define ZXSHADY_NODISCARD
+#endif
+
+#ifdef ZXSHADY_CPP_VER >= 202002L
+#include <bit>
+#else
+#include <cstring>
 #endif
 
 namespace zxshady {
